@@ -1,0 +1,43 @@
+.exercise {
+  background-color: blue;
+  border: 2px solid black;
+  border-radius: 10%;
+  width: 500px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.total_errors {
+  background-color: #e1e1e1;
+  border-radius: 10%;
+  display: flex;
+  flex-direction: column;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 20px;
+  background-color: white;
+  width: 800px;
+}
+
+.daily_errors {
+  display: flex;
+  flex-direction: column;
+}
+
+.words_list {
+  display: flex;
+  flex-wrap: wrap;
+  margin: -10x;
+}
+
+.word {
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+.body {
+  margin: 0;
+  padding: 0;
+  display: flex;
+}

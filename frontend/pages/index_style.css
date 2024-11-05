@@ -1,0 +1,83 @@
+.body {
+  display: flex;
+  background-color: #e1e1e1;
+  margin: 0;
+  padding: 0;
+}
+
+.navigation_bar {
+  display: flex;
+  color:white;
+  background-color: white;
+  border: 2px solid black;
+  border-color: black;
+  border-top-right-radius: 10%;
+  margin-right: 20px;
+  width: 400px;
+  height: 750px;
+}
+
+.notification_bar {
+  display: flex;
+  color:white;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 10%;
+  height: 700px;
+}
+
+.information_bar {
+  display: flex;
+  color:white;
+  float: right;
+}
+
+.search_bar {
+  display: flex;
+  color:white;
+}
+
+.problem_set {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 calc(25%-20px);
+  color:white;
+  margin: 20px;
+  border: 2px solid black ;
+  border-radius: 10%;
+  box-sizing: border-box;
+  text-align: center;
+  width: 180px;
+}
+
+.problem_set_bar {
+  width: 800px;
+  display: flex;
+  flex-direction: column;
+  color:white;
+}
+
+.link_bar {
+  display: flex;
+  color:white;
+}
+
+.avatar {
+  display: flex;
+  border-radius: 10px;
+}
+
+.link_button {
+  display: flex;
+  border: 2px solid black;
+  border-radius: 10px;
+  margin-bottom: 30px;
+  margin-right: 50px;
+  padding: 10px;
+  gap: 20px;
+
+}
+
+.link_button:hover {
+  background-color: blue;
+}
