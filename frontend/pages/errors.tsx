@@ -2,7 +2,7 @@
 import InformationBar from "../components/InformationBar";
 import NavigationBar from "../components/NavigationBar";
 import "./errors_style.css"
-import config from "../config"
+//import config from "../config"
 
 // 错题复习检验
 function Exercise() {

@@ -83,6 +83,7 @@ function AnswerBar() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 记录答题进度
   const [loading, setLoading] = useState(true);
   const [wordId, setWordId] = useState<number>(0);
+  //const [pool, setPool] = useState(null);
 
   const router = useRouter();
   const { pool } = router.query;
@@ -133,7 +134,7 @@ function AnswerBar() {
     }
 
     fetchQuestion();
-  }, [questions]);
+  }, [questions, pool]);
 
   if (loading) {
     return (
@@ -175,7 +176,7 @@ function AnswerBar() {
     return (
       <div className="answer_bar">
         <div style={{display:"flex", flexDirection:"row-reverse"}}>
-          <StarButton wordID={wordId} />
+          <StarButton wordID=wordId />
         </div>
         <>
           <h3>{currentQuestion.word.word}</h3>
@@ -280,6 +281,7 @@ function ReportBar({correct, wrong}: ReportProps) {
     )
 }
 
+/*
 // 历史记录栏
 // TODO:点击 history icon 展开，同时其他部分颜色加深，点击其他地方收回
 function HistoryBar() {
@@ -294,6 +296,7 @@ function HistoryBar() {
     </div>
   )
 }
+  */
 
 // TODO:错题收藏功能
 

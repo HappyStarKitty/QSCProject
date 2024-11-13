@@ -3,7 +3,7 @@
 ## 部署方式
 
 ```
-git clone 
+git clone https://github.com/HappyStarKitty/QSCProject.git
 cd frontend
 npm install
 npm run dev
@@ -25,9 +25,10 @@ npm run dev
 
 1. 页面跳转时布局有变化（未发现原因）
 2. ts类型检查未通过，error很多
-3. 
+3. 选项可能出现相同
 
 ## TODO
 
-1. 历史记录
+1. 历史记录功能
 2. 剩余单词更新
+3. 上传文件的api测试
