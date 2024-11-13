@@ -1,8 +1,9 @@
 // 登陆页面
 import "./login_style.css"
-import {useState, useEffect} from 'react';
+import {useState} from 'react';
 import config from "../config";
 import {useRouter} from "next/router";
+import NavigationBar from "@/components/NavigationBar";
 
 // 登陆弹框
 function LoginModal ()
@@ -26,6 +27,7 @@ function LoginModal ()
 
     if (!username || !password) {
       setError("用户名和密码不能为空");
+      console.log(error);
       return ;
     }
 
@@ -43,8 +45,9 @@ function LoginModal ()
         body: JSON.stringify({"username": username, "password": password}),
         credentials: 'include'
       })
-      .then(response => response.json())
-      .then(data => {console.log(data)});
+      
+      const data = await response.json();
+      console.log(data);
 
       // 自动跳转主页
       setTimeout(() => {router.push('/');}, 1000);
@@ -55,19 +58,19 @@ function LoginModal ()
   };
 
   return (
-  <div>
+  <div className="form">
     <form onSubmit={handleSubmit}>
-      <div>
+      <div style={{margin:"50px"}}>
         <label htmlFor="username">用户名：</label>
         <input type="text" id="username" value={username} onChange={handleUsernameChange}
           placeholder='请输入用户名' required></input>
       </div>
-      <div>
+      <div style={{margin:"50px"}}>
         <label htmlFor="password">密码：</label>
         <input type="text" id="password" value={password} onChange={handlePasswordChange}
           placeholder="请输入密码" required></input>
       </div>
-      <button onClick={handleSubmit}>提交</button>
+      <button style={{marginLeft:"260px"}} onClick={handleSubmit}>提交</button>
     </form>
   </div>)
   
@@ -75,7 +78,10 @@ function LoginModal ()
 
 function LoginPage() {
   return (
-    <LoginModal />
+    <div className="body">
+      <NavigationBar />
+      <LoginModal />
+    </div>
   )
 }
 

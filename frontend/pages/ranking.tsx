@@ -4,6 +4,7 @@ import config from "../config";
 import {useState, useEffect} from 'react';
 import Image from 'next/image';
 
+/*
 interface LoginDays {
   username: string,
   login_days: number
@@ -13,14 +14,15 @@ interface WordsLearned {
   username: string,
   words_learned: number
 }
+*/
 
 function DaysRankingBar () {
-  const [data, setData] = useState<WordsLearned[] | null>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchWords = async () => {
       try {
-        const response = await fetch(config.apiUrl + "/login_days", {
+        const response = await fetch(config.apiUrl + "/api/login_days", {
           method: "GET",
           credentials: "include"
         });
@@ -32,21 +34,29 @@ function DaysRankingBar () {
     }
 
     fetchWords();
-  })
-
-  const sortedData = data ? data.sort((a, b) => a.words_learned - b.words_learned) : data;
+  }, [])
 
   return (
     <div className="ranking_bar">
-      <Image src="/figures/icon/ranking.svg" alt="ranking.svg" height={20} width={20} />
-      <p>坚持天数排行榜</p>
-      <ul>
-        {sortedData ? (
-          sortedData!.map((item, index) => (
-            <li className="ranking_item" key={item.username}>
-              <p>{index + 1}</p>
-              <p>{item.username}</p>
-              <p>{item.words_learned}</p>
+      <div style={{display:"flex", alignItems:"center"}}>
+        <Image src="/figures/icon/ranking.svg" alt="ranking.svg" height={40} width={40} />
+        <p style={{fontSize:"16px", marginLeft:"20px"}}>坚持天数排行榜</p>
+      </div>
+      <ul style={{listStyleType:"none"}}>
+        {data ? (
+          data!.map((item, index) => (
+            <li className="ranking_item" key={`days${item.login_days}`}>
+              <div style={{display:"flex", gap:"80px"}}>
+                <div style={{width:"50px"}}>
+                  <p>{index + 1}</p>
+                </div>
+                <div style={{width:"100px"}}>
+                  <p>{item[0]}</p>
+                </div>
+                <div style={{width:"100px"}}>
+                  <p>{item[1]}天</p>
+                </div>
+              </div>
             </li>
           )))
       : (<li>没有数据可显示</li>
@@ -57,12 +67,12 @@ function DaysRankingBar () {
 }
 
 function WordsRankingBar () {
-  const [data, setData] = useState<WordsLearned[] | null>(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
     const fetchWords = async () => {
       try {
-        const response = await fetch(config.apiUrl + "/words_learned", {
+        const response = await fetch(config.apiUrl + "/api/words_learned", {
           method: "GET",
           credentials: "include"
         });
@@ -74,21 +84,29 @@ function WordsRankingBar () {
     }
 
     fetchWords();
-  })
-
-  const sortedData = data ? data.sort((a, b) => a.words_learned - b.words_learned) : data;
+  },[])
 
   return (
     <div className="ranking_bar">
-      <Image src="/figures/icon/ranking.svg" alt="ranking.svg" height={20} width={20} />
-      <p>答题道数排行榜</p>
-      <ul>
-        {sortedData ? (
-          sortedData!.map((item, index) => (
-            <li className="ranking_item" key={item.username}>
-              <p>{index + 1}</p>
-              <p>{item.username}</p>
-              <p>{item.words_learned}</p>
+      <div style={{display:"flex", alignItems:"center"}}>
+        <Image src="/figures/icon/ranking.svg" alt="ranking.svg" height={40} width={40} />
+        <p style={{marginLeft:"20px"}}>答题道数排行榜</p>
+      </div>
+      <ul style={{listStyleType:"none"}}>
+        {data ? (
+          data!.map((item, index) => (
+            <li className="ranking_item" key={`words${index}`}>
+              <div style={{display:"flex", gap:"80px"}}>
+                <div style={{width:"50px"}}>
+                  <p>{index + 1}</p>
+                </div>
+                <div style={{width:"100px"}}>
+                  <p>{item[0]}</p>
+                </div>
+                <div style={{width:"100px"}}>
+                  <p>{item[1]}道</p>
+                </div>
+              </div>
             </li>
           )))
       : (<li>没有数据可显示</li>
@@ -100,11 +118,13 @@ function WordsRankingBar () {
 
 function RankingPage () {
   return (
-    <div className="body">
-      <div>
+    <div>
+      <div className="body">
         <NavigationBar />
-        <WordsRankingBar />
-        <DaysRankingBar />
+        <div style={{display:"flex", gap:"50px", marginTop:"40px", marginLeft:"20px"}}>
+          <WordsRankingBar />
+          <DaysRankingBar />
+        </div>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 .exercise {
-  background-color: blue;
+  background-color: #7AC5F8;
   border: 2px solid black;
   border-radius: 20px;
   width: 500px;
@@ -35,7 +35,6 @@
 .word {
   margin-right: 20px;
   margin-bottom: 10px;
-  width: 200px;
 }
 
 .body {

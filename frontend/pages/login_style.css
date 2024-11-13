@@ -1,0 +1,16 @@
+.form {
+  display: flex;
+  border-radius: 20px;
+  border: 2px solid black;
+  margin-top: 140px;
+  margin-left: 240px;
+  background-color: white;
+  height: 300px;
+  width: 500px;
+  padding: 50px;
+}
+
+.body {
+  position: fixed;
+  background-color: #e1e1e1;
+}

@@ -5,6 +5,7 @@ import { useEffect , useState} from 'react';
 import config from "../config";
 import {useRouter} from 'next/router';
 
+/*
 interface LoginRequest {
   username: string;
   password: string;
@@ -15,6 +16,8 @@ interface LoginResponse {
   username?: string;
   error?: string;
 }
+*/
+
 interface CheckLoginResponse {
   username?: string;
   email?: string;
@@ -25,25 +28,26 @@ interface CheckLoginResponse {
 
 // 下拉菜单
 function DropdownMenu () {
-  const [isOpen, setIsOpen] = useState(false);
+  //const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
+  /*
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
+  */
 
   const handleLogin = () => {
     router.push('/login');
   }
 
   return (
-    <div className="dropdown_container">
-      <Image src="/figures/icon/toggle.svg" alt="toggle.svg" onClick={toggleMenu} width={30} height={30} />
-
-      {isOpen && (
-        <div className="dropdown_menu">
-          <button onClick={handleLogin}>登陆</button>
-        </div>
+    <div style={{width:"50px", height:"40px"}}>
+      <Image src="/figures/icon/toggle.svg" alt="toggle.svg" onClick={handleLogin} width={30} height={30} />
+      {false && (
+          <div onClick={handleLogin} style={{height:"20px", marginTop:"-10px"}}>
+            <p style={{color:"black"}}>登录</p>
+          </div>
       )}
     </div>
   )

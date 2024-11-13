@@ -15,10 +15,11 @@ interface WordResponse {
   meaning: string;
   detail: string;
 }
-
+/*
 interface OptionsResponse {
   options: string[];
 }
+  */
 
 interface Question {
   word: WordResponse;
@@ -31,6 +32,46 @@ interface ReportProps {
   wrong: Question[];
 }
 
+// 收藏功能
+function StarButton ( wordID: number ) {
+  const [isStarred, setIsStarred] = useState(false);
+
+  const handleStarClick = async () => {
+    try {
+      let response;
+      if (isStarred) {
+        response = await fetch(config.apiUrl + `/api/favorite?word_id=${wordID}`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+      } else {
+        response = await fetch(config.apiUrl + `/api/unfavorite?word_id=${wordID}`, {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        })
+      }
+
+      const data = response.json();
+      console.log(data);
+      setIsStarred(!isStarred);
+    } catch (error) {
+      console.error("Failed to favorite the word.", error);
+    }
+  }
+
+  return (
+    <div style={{display:"flex", flexDirection:"row-reverse", alignItems:"flex-end"}}>
+      <Image src={isStarred ? '/figures/icon/star_light.svg' : '/figures/icon/star_dark.svg'}
+        alt="star.svg" width={40} height={40} style={{float:"right"}} onClick={handleStarClick}/>
+    </div>
+  )
+}
 // 答题栏
 function AnswerBar() {
   const [questions, setQuestions] = useState<Question[]>([]); // 存放本次答题题目
@@ -41,6 +82,7 @@ function AnswerBar() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null); // 记录选择选项
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 记录答题进度
   const [loading, setLoading] = useState(true);
+  const [wordId, setWordId] = useState<number>(0);
 
   const router = useRouter();
   const { pool } = router.query;
@@ -81,6 +123,7 @@ function AnswerBar() {
         }
 
         setQuestions((prev) => [...prev, newQuestion]);
+        setWordId(newQuestion.word.id);
         //setCurrentQuestionIndex(questions.length - 1);
       } catch (error) {
         console.log("Failed to fetch question.", error);
@@ -131,6 +174,9 @@ function AnswerBar() {
 
     return (
       <div className="answer_bar">
+        <div style={{display:"flex", flexDirection:"row-reverse"}}>
+          <StarButton wordID={wordId} />
+        </div>
         <>
           <h3>{currentQuestion.word.word}</h3>
           <p>{currentQuestion.word.detail}</p>
@@ -148,9 +194,9 @@ function AnswerBar() {
                   textAlign: "center",
                   backgroundColor:
                     showResult && option === currentQuestion.correctAnswer
-                      ? 'green'
+                      ? '#8CEF84'
                       : showResult && option === selectedOption
-                      ? 'red'
+                      ? '#F97070'
                       : 'transparent' 
                 }}>
                   <p>{optionsLabels[index]}. {option}</p>
@@ -187,11 +233,11 @@ function LeftBar() {
 
           </div>
         </li>
-        <li>
-          <LinkButton imageUrl='figures/icon/history.svg' text="历史记录" clickFun={() => {router.push('/')}} />
+        <li onClick={() => {router.push('/')}}>
+          <LinkButton imageUrl='figures/icon/history.svg' text="历史记录"  />
         </li>
-        <li>
-          <LinkButton imageUrl='figures/icon/log_out.svg' text="退出" clickFun={() => {router.push('/')}} />
+        <li onClick={() => {router.push('/')}}>
+          <LinkButton imageUrl='figures/icon/log_out.svg' text="退出"  />
         </li>
       </ul>
     </div>
@@ -217,7 +263,7 @@ function ReportBar({correct, wrong}: ReportProps) {
         <h4>你还没完全掌握：</h4>
         <div className="word_list">
           {wrong.map((wrongQuestion) => (
-              <p className="word">
+              <p className="word" key={wrongQuestion.word.word}>
                 {wrongQuestion.word.word}
               </p>
           ))}

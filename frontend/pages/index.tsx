@@ -7,24 +7,24 @@ import config from "../config";
 import {useRouter} from "next/router";
 import {useState, useEffect} from "react";
 
-// 题目集有四种类型：所有、个人词库、收藏词库、题目词库
+// 题目集有四种类型：所有、个人词库、收藏词库、错题词库
 interface ProblemSet {
   title: string,
   description: string,
-  set: "all" | "library" | "favorites" | "miss" 
+  set: "all" | "libraries" | "favorites" | "misses" 
 }
 
 // 题目集
 function ProblemSetBar(problemSet: ProblemSet) {
   const router = useRouter();
   const handleFavorites = () => {
-    router.push('/answer?pool=favorite');
+    router.push('/answer?pool=favorites');
   }
   const handleMiss = () => {
-    router.push('/answer?pool=miss');
+    router.push('/answer?pool=misses');
   }
   const handleLibrary = () => {
-    router.push('/answer?pool=library');
+    router.push('/answer?pool=libraries');
   }
 
   if (problemSet.set === "favorites") {
@@ -44,7 +44,7 @@ function ProblemSetBar(problemSet: ProblemSet) {
       )
     }
    
-    else if (problemSet.set === "miss") {
+    else if (problemSet.set === "misses") {
       return (
         <div className="problem_set" onClick={handleMiss}>
           <div style={{width: "100%", height:"50%"}}>
@@ -61,7 +61,7 @@ function ProblemSetBar(problemSet: ProblemSet) {
         )
       }
 
-    else if (problemSet.set === "library") {
+    else if (problemSet.set === "libraries") {
       return (
         <div className="problem_set" onClick={handleLibrary}>            
           <div style={{width: "100%", height:"50%"}}>
@@ -80,10 +80,11 @@ function ProblemSetBar(problemSet: ProblemSet) {
 
 // 题目集栏
 function TotalProblemSetBar() {
-  const router = useRouter();
+  //const router = useRouter();
   const [favorites, setFavorites] = useState(null);
   const [library, setLibrary] = useState(null);
   const [miss, setMiss] = useState(null);
+  const [wordID, setWordID] = useState(0);
 
   // 判断题目集是否进行
   useEffect(() => {
@@ -144,21 +145,21 @@ function TotalProblemSetBar() {
     <div className="problem_set_bar">
       <p style={{color: "black"}}>进行中的题目集</p>
       <div style={{display: "flex", flexWrap: "wrap", margin: "-10px", overflow:"auto", height:"180px"}}>
-        {(favorites && !favorites.error && !favorites?.message)
+        {(favorites && !favorites!.error && !favorites!.message)
         ? <ProblemSetBar title="收藏集" description="收藏单词集" set="favorites" />
         : <></>}
         {(miss && !miss!.error && !miss.message)
-        ? <ProblemSetBar title="错题集" description="错题单词集" set="favorites" />
+        ? <ProblemSetBar title="错题集" description="错题单词集" set="misses" />
         : <></>}
         {(library && !library.error && !library?.message)
-        ? <ProblemSetBar title="自定义" description="自定义单词集" set="favorites" />
+        ? <ProblemSetBar title="自定义" description="自定义单词集" set="libraries" />
         : <></>}
       </div>
       <p style={{color: "black"}}>全部题目集</p>
       <div style={{display: "flex", flexWrap: "wrap", margin: "-10px", overflow:"auto"}}>
         <ProblemSetBar title="收藏集" description="收藏单词集" set="favorites"/>
-        <ProblemSetBar title="错题集" description="错题单词集" set="miss"/>
-        <ProblemSetBar title="自定义" description="自定义错题集" set="library"/>
+        <ProblemSetBar title="错题集" description="错题单词集" set="misses"/>
+        <ProblemSetBar title="自定义" description="自定义错题集" set="libraries"/>
       </div>
     </div>
   )
