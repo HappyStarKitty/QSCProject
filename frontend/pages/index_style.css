@@ -1,20 +1,26 @@
 .body {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   display: flex;
   background-color: #e1e1e1;
   margin: 0;
   padding: 0;
+  position: fixed;
 }
 
 .navigation_bar {
   display: flex;
   color:white;
   background-color: white;
-  border: 2px solid black;
-  border-color: black;
-  border-top-right-radius: 10%;
+  border: 2px solid white;
+  border-top-right-radius: 40px;
   margin-right: 20px;
-  width: 400px;
+  width: 220px;
   height: 750px;
+  padding-right: 20px;
+  padding-left: 0px;
 }
 
 .notification_bar {
@@ -22,19 +28,31 @@
   color:white;
   background-color: white;
   border: 2px solid black;
-  border-radius: 10%;
-  height: 700px;
+  border-radius: 40px;
+  height: 500px;
+  width: 200px;
+  margin-right: 20px;
+  padding: 20px;
 }
 
 .information_bar {
   display: flex;
   color:white;
   float: right;
+  align-items: center;
+  gap: 20px;
+  height: 30px;
+  margin-left: auto;
+  margin-right: 40px;
 }
 
 .search_bar {
   display: flex;
   color:white;
+  border-radius: 20px;
+  height: 30px;
+  width: 300px;
+  padding-left: 10px;
 }
 
 .problem_set {
@@ -47,7 +65,9 @@
   border-radius: 10%;
   box-sizing: border-box;
   text-align: center;
-  width: 180px;
+  width: 160px;
+  height: 120px;
+  gap: 5px;
 }
 
 .problem_set_bar {
@@ -64,20 +84,25 @@
 
 .avatar {
   display: flex;
-  border-radius: 10px;
+  border-radius: 50%;
 }
 
 .link_button {
   display: flex;
   border: 2px solid black;
   border-radius: 10px;
-  margin-bottom: 30px;
-  margin-right: 50px;
+  margin-bottom: 15px;
   padding: 10px;
-  gap: 20px;
-
+  gap: 15px;
+  width: 130px;
+  height: 40px;
+  align-items: center;
 }
 
 .link_button:hover {
   background-color: blue;
+}
+
+li {
+  margin-bottom: 5px;
 }

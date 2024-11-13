@@ -2,6 +2,7 @@
 import InformationBar from "../components/InformationBar";
 import NavigationBar from "../components/NavigationBar";
 import "./errors_style.css"
+import config from "../config"
 
 // 错题复习检验
 function Exercise() {
@@ -18,7 +19,7 @@ function DailyErrors() {
   return(
     <div className="daily_erros">
       <p>2024年10月24日</p>
-      <div style={{backgroundColor:"#e1e1e1", borderRadius:"10%", padding:"20px"}}>
+      <div style={{backgroundColor:"#e1e1e1", borderRadius:"20px", padding:"20px"}}>
         <p>新编大学英语</p>
         <div className="words_list">
           <p className="word">abandon</p>

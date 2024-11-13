@@ -5,13 +5,14 @@ import Image from "next/image";
 interface LinkButtonProps {
   imageUrl: string;
   text: string;
+  clickFun: (args: any) => any;
 }
 
-function LinkButton ({imageUrl, text}: LinkButtonProps) {
+function LinkButton ({imageUrl, text, clickFun}: LinkButtonProps) {
   return (
-    <div className="link_button">
-      <Image src={imageUrl} alt={imageUrl} height={40} width={40} />
-      <p>{text}</p>
+    <div className="link_button" onClick={clickFun}>
+      <Image src={imageUrl} alt={imageUrl} height={35} width={35} />
+      <p color="black">{text}</p>
     </div>
   )
 }
