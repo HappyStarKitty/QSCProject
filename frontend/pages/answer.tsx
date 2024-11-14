@@ -44,20 +44,22 @@ function StarButton ( props: StarButtonProps ) {
     try {
       let response;
       if (isStarred) {
-        response = await fetch(config.apiUrl + `/api/favorite?word_id=${props.wordID}`, {
+        response = await fetch(config.apiUrl + `/api/favorite`, {
           method: "POST",
           credentials: "include",
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
+          body: JSON.stringify({word_id: props.wordID})
         })
       } else {
-        response = await fetch(config.apiUrl + `/api/unfavorite?word_id=${props.wordID}`, {
+        response = await fetch(config.apiUrl + `/api/unfavorite`, {
           method: "POST",
           credentials: "include",
           headers: {
             'Content-Type': 'application/json',
-          }
+          },
+          body: JSON.stringify({word_id: props.wordID})
         })
       }
 
@@ -138,7 +140,7 @@ function AnswerBar() {
     }
 
     fetchQuestion();
-  }, [questions, pool]);
+  }, [pool]);
 
   if (loading) {
     return (

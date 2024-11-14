@@ -14,6 +14,18 @@ interface ProblemSet {
   set: "all" | "libraries" | "favorites" | "misses" 
 }
 
+interface Word {
+  id: number,
+  word: string,
+  meaning: string,
+  detail: string
+}
+
+interface ErrorResponse {
+  error?: string,
+  message?: string
+}
+
 // 题目集
 function ProblemSetBar(problemSet: ProblemSet) {
   const router = useRouter();
@@ -81,85 +93,65 @@ function ProblemSetBar(problemSet: ProblemSet) {
 // 题目集栏
 function TotalProblemSetBar() {
   //const router = useRouter();
-  const [favorites, setFavorites] = useState(null);
-  const [library, setLibrary] = useState(null);
-  const [miss, setMiss] = useState(null);
-  const [wordID, setWordID] = useState(0);
+  const [favorites, setFavorites] = useState<Word[] | ErrorResponse | null>(null);
+  const [library, setLibrary] = useState<Word[] | ErrorResponse | null>(null);
+  const [miss, setMiss] = useState<Word[] | ErrorResponse | null>(null);
+  //const [wordID, setWordID] = useState(0);
 
   // 判断题目集是否进行
   useEffect(() => {
-    // fetch 收藏集
-    const fetchFavorites = async () => {
+    const fetchData = async () => {
       try {
-        const favoritesResponse = await fetch(config.apiUrl + '/api/get_favorites', {
-          method: "GET",
-          credentials: "include",
-        });
-
+        const [favoritesResponse, missResponse, libraryResponse] = await Promise.all([
+          fetch(config.apiUrl + '/api/get_favorites', { method: "GET", credentials: "include" }),
+          fetch(config.apiUrl + '/api/get_misses', { method: "GET", credentials: "include" }),
+          fetch(config.apiUrl + '/api/get_libraries', { method: "GET", credentials: "include" })
+        ]);
+        
         const favoritesData = await favoritesResponse.json();
-        setFavorites(favoritesData);
-        console.log(favorites);
-      } catch (error) {
-        console.error("Failed to fetch favorites set", error);
-      }
-    };
-
-    // fetch 错题集
-    const fetchMiss = async () => {
-      try {
-        const missResponse = await fetch(config.apiUrl + '/api/get_misses', {
-          method: "GET",
-          credentials: "include",
-        })
-
         const missData = await missResponse.json();
-        setMiss(missData);
-        console.log(miss);
-      } catch (error) {
-        console.error("Failed to fetch miss set", error);
-      }
-    };
-
-    // fetch 自定义集
-    const fetchLibrary = async () => {
-      try {
-        const libraryResponse = await fetch(config.apiUrl + '/api/get_libraries', {
-          method: "GET",
-          credentials: "include",
-        });
-
         const libraryData = await libraryResponse.json();
+  
+        setFavorites(favoritesData);
+        setMiss(missData);
         setLibrary(libraryData);
-        console.log(library);
       } catch (error) {
-        console.error("Failed to fetch library set", error);
+        console.error("Failed to fetch sets", error);
       }
     };
-
-    fetchFavorites();
-    fetchMiss();
-    fetchLibrary();
-  },[]);
+  
+    fetchData();
+  }, []);  // 只在组件挂载时执行一次
+  
 
   return (
     <div className="problem_set_bar">
       <p style={{color: "black"}}>进行中的题目集</p>
       <div style={{display: "flex", flexWrap: "wrap", margin: "-10px", overflow:"auto", height:"180px"}}>
-        {(favorites && !favorites!.error && !favorites!.message)
-        ? <ProblemSetBar title="收藏集" description="收藏单词集" set="favorites" />
-        : <></>}
-        {(miss && !miss!.error && !miss.message)
-        ? <ProblemSetBar title="错题集" description="错题单词集" set="misses" />
-        : <></>}
-        {(library && !library.error && !library?.message)
-        ? <ProblemSetBar title="自定义" description="自定义单词集" set="libraries" />
-        : <></>}
+        { favorites ? (
+          Array.isArray(favorites) ? (
+            <ProblemSetBar title="收藏集" description="收藏单词集" set="favorites" />
+          ) : (<></>)
+          ) : (<></>) 
+        }
+        { miss ? (
+          Array.isArray(miss) ? (
+            <ProblemSetBar title="错题集" description="答错单词集" set="misses" />
+          ) : (<></>)
+          ) : (<></>) 
+        }
+        { library ? (
+          Array.isArray(library) ? (
+            <ProblemSetBar title="自定义" description="自定义单词集" set="libraries" />
+          ) : (<></>)
+          ) : (<></>) 
+        }
       </div>
       <p style={{color: "black"}}>全部题目集</p>
       <div style={{display: "flex", flexWrap: "wrap", margin: "-10px", overflow:"auto"}}>
         <ProblemSetBar title="收藏集" description="收藏单词集" set="favorites"/>
         <ProblemSetBar title="错题集" description="错题单词集" set="misses"/>
-        <ProblemSetBar title="自定义" description="自定义错题集" set="libraries"/>
+        <ProblemSetBar title="自定义" description="自定义单词集" set="libraries"/>
       </div>
     </div>
   )
