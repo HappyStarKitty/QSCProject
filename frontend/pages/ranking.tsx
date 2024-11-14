@@ -17,7 +17,7 @@ interface WordsLearned {
 */
 
 function DaysRankingBar () {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<[string, number][] | null>(null);
 
   useEffect(() => {
     const fetchWords = async () => {
@@ -45,7 +45,7 @@ function DaysRankingBar () {
       <ul style={{listStyleType:"none"}}>
         {data ? (
           data!.map((item, index) => (
-            <li className="ranking_item" key={`days${item.login_days}`}>
+            <li className="ranking_item" key={`days${item[1]}`}>
               <div style={{display:"flex", gap:"80px"}}>
                 <div style={{width:"50px"}}>
                   <p>{index + 1}</p>
@@ -67,7 +67,7 @@ function DaysRankingBar () {
 }
 
 function WordsRankingBar () {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState<[string, number][] | null>(null);
 
   useEffect(() => {
     const fetchWords = async () => {

@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect} from "react";
 
 interface Word {
-  id: string,
+  id: number,
   word: string,
   meaning: string,
   detail: string
@@ -54,9 +54,9 @@ function DailyErrors() {
     }
 
     fetchSet();
-  }, [wordList]);
+  }, [wordList, set]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: number) => {
     try {
       const response = await fetch(config.apiUrl + "/api/delete", {
         method: 'POST',
@@ -74,7 +74,7 @@ function DailyErrors() {
     }
   }
 
-  const handleContextMenu = (event, id) => {
+  const handleContextMenu = (event: React.MouseEvent, id: number) => {
     event.preventDefault();
     handleDelete(id);
   }

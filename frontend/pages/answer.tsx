@@ -32,15 +32,19 @@ interface ReportProps {
   wrong: Question[];
 }
 
+interface StarButtonProps {
+  wordID: number;
+}
+
 // 收藏功能
-function StarButton ( wordID: number ) {
+function StarButton ( props: StarButtonProps ) {
   const [isStarred, setIsStarred] = useState(false);
 
   const handleStarClick = async () => {
     try {
       let response;
       if (isStarred) {
-        response = await fetch(config.apiUrl + `/api/favorite?word_id=${wordID}`, {
+        response = await fetch(config.apiUrl + `/api/favorite?word_id=${props.wordID}`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -48,7 +52,7 @@ function StarButton ( wordID: number ) {
           }
         })
       } else {
-        response = await fetch(config.apiUrl + `/api/unfavorite?word_id=${wordID}`, {
+        response = await fetch(config.apiUrl + `/api/unfavorite?word_id=${props.wordID}`, {
           method: "POST",
           credentials: "include",
           headers: {
@@ -82,7 +86,7 @@ function AnswerBar() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null); // 记录选择选项
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 记录答题进度
   const [loading, setLoading] = useState(true);
-  const [wordId, setWordId] = useState<number>(0);
+  //const [wordId, setWordId] = useState<number | null>(null);
   //const [pool, setPool] = useState(null);
 
   const router = useRouter();
@@ -124,7 +128,7 @@ function AnswerBar() {
         }
 
         setQuestions((prev) => [...prev, newQuestion]);
-        setWordId(newQuestion.word.id);
+        //setWordId(newQuestion.word.id);
         //setCurrentQuestionIndex(questions.length - 1);
       } catch (error) {
         console.log("Failed to fetch question.", error);
@@ -176,7 +180,7 @@ function AnswerBar() {
     return (
       <div className="answer_bar">
         <div style={{display:"flex", flexDirection:"row-reverse"}}>
-          <StarButton wordID=wordId />
+          <StarButton wordID={questions[currentQuestionIndex].word.id} />
         </div>
         <>
           <h3>{currentQuestion.word.word}</h3>

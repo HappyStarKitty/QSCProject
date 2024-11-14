@@ -11,7 +11,7 @@ function LoginModal ()
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  //const [isSubmitting, setIsSubmitting] = useState(false);
 
   const router = useRouter();
 
@@ -31,7 +31,7 @@ function LoginModal ()
       return ;
     }
 
-    setIsSubmitting(true);
+    //setIsSubmitting(true);
 
     // console.log(JSON.stringify({"username": username, "password": password}));
     console.log(config.apiUrl + "/api/login");
