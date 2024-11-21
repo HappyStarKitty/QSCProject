@@ -4,9 +4,23 @@ import "./answer_style.css"
 import InformationBar from "../components/InformationBar"
 import LinkButton from '@/components/LinkButton'
 import config from "../config"
-import {useState, useEffect} from "react";
+import React, {useState, useEffect, useContext, createContext} from "react";
 import { useRouter } from 'next/router';
+import { ModalProvider, useModal } from '@/components/ModalContext';
+import AlertModal from "../components/AlertModal";
 //import {GetServerSideProps} from "next";
+
+const ProblemIndexContext = createContext<{ problemIndex: number; setProblemIndex: React.Dispatch<React.SetStateAction<number>>} | undefined>(undefined);
+
+const ProblemIndexContextProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
+  const [problemIndex, setProblemIndex] = useState(0);
+
+  return (
+    <ProblemIndexContext.Provider value={{problemIndex, setProblemIndex}}>
+      {children}
+    </ProblemIndexContext.Provider>
+  );
+};
 
 // 单词
 interface WordResponse {
@@ -19,7 +33,7 @@ interface WordResponse {
 interface OptionsResponse {
   options: string[];
 }
-  */
+*/
 
 interface Question {
   word: WordResponse;
@@ -78,6 +92,7 @@ function StarButton ( props: StarButtonProps ) {
     </div>
   )
 }
+
 // 答题栏
 function AnswerBar() {
   const [questions, setQuestions] = useState<Question[]>([]); // 存放本次答题题目
@@ -86,16 +101,24 @@ function AnswerBar() {
   const [wrongQuestions, setWrongQuestions] = useState<Question[]>([]); // 存放回答错误题目
   const [showResult, setShowResult] = useState(false); // 控制答案显示状态
   const [selectedOption, setSelectedOption] = useState<string | null>(null); // 记录选择选项
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0); // 记录答题进度
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0); // 记录答题进度
   const [loading, setLoading] = useState(true);
+  const [isClick, setIsClick] = useState(false);
+  const [starKey, setStarKey] = useState(0);
+  const context = useContext(ProblemIndexContext);
   //const [wordId, setWordId] = useState<number | null>(null);
   //const [pool, setPool] = useState(null);
 
+  if (!context) {
+    throw new Error("Failed to use problem index context.")
+  }
+  const {problemIndex, setProblemIndex} = context;
+
   const router = useRouter();
-  const { pool } = router.query;
+  const { pool, number } = router.query;
 
   const optionsLabels = ["A", "B", "C", "D"];
-  const words_total = 5; // 每日一练题目数量
+  const words_total = Number(number); // 每日一练题目数量
 
   useEffect(() => {
     if (!pool) return;
@@ -130,6 +153,7 @@ function AnswerBar() {
         }
 
         setQuestions((prev) => [...prev, newQuestion]);
+        setStarKey((prev) => prev + 1);
         //setWordId(newQuestion.word.id);
         //setCurrentQuestionIndex(questions.length - 1);
       } catch (error) {
@@ -140,7 +164,7 @@ function AnswerBar() {
     }
 
     fetchQuestion();
-  }, [pool]);
+  }, [pool, isClick]);
 
   if (loading) {
     return (
@@ -152,23 +176,28 @@ function AnswerBar() {
   const handleOptionClick = (option: string) => {
     setShowResult(true);
     setSelectedOption(option);
+    setIsClick(!isClick);
     console.log("show result");
 
     if (option === questions[currentQuestionIndex].correctAnswer) {
       // setCorrectCount((prev) => prev + 1);
       setCorrectQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
+      console.log("Your answer is true");
     }
 
     else {
       setWrongQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
+      console.log("Your answer is wrong.");
     }
 
+    console.log(currentQuestionIndex);
     console.log("next question");
 
     setTimeout(() => {
       setSelectedOption(null);
       setShowResult(false);
-      setCurrentQuestionIndex((prev) => prev + 1);
+      setCurrentQuestionIndex((prev) => (prev + 1));
+      setProblemIndex((prev) => prev + 1);
     }, 2000);
   }
 
@@ -177,34 +206,35 @@ function AnswerBar() {
       return <ReportBar correct={correctQuestions} wrong={wrongQuestions}/>
     }
 
-    const currentQuestion: Question = questions[currentQuestionIndex];
+    const currentQuestion: Question = questions[currentQuestionIndex!];
 
     return (
       <div className="answer_bar">
-        <div style={{display:"flex", flexDirection:"row-reverse"}}>
-          <StarButton wordID={questions[currentQuestionIndex].word.id} />
+        <div style={{display:"flex", justifyContent:"flex-end", width:"700px", marginBottom:"-40px"}}>
+          <StarButton wordID={questions[currentQuestionIndex].word.id} key={starKey}/>
         </div>
         <>
-          <h3>{currentQuestion.word.word}</h3>
-          <p>{currentQuestion.word.detail}</p>
+          <p style={{fontSize:"30px", fontWeight:"bold"}}>{currentQuestion.word.word}</p>
+          <p style={{fontSize:"16px", fontWeight:"bold", marginTop:"-20px"}}>{currentQuestion.word.detail}</p>
           <ul>
             {currentQuestion.options.map((option, index) => (
               <li key={index}>
                 <button onClick={() => handleOptionClick(option)} style={{
                   flex: "display",
-                  border: "2px solid black",
-                  borderRadius: "20px",
-                  width: "400px",
+                  border: "1px solid black",
+                  borderRadius: "10px",
+                  boxShadow: "2px 2px 5px rgb(0,0,0,0.4)",
+                  width: "700px",
                   marginBottom: "10px",
                   marginTop: "20px",
-                  padding: "5px",
+                  padding: "4px",
                   textAlign: "center",
                   backgroundColor:
                     showResult && option === currentQuestion.correctAnswer
                       ? '#8CEF84'
                       : showResult && option === selectedOption
                       ? '#F97070'
-                      : 'transparent' 
+                      : 'white' 
                 }}>
                   <p>{optionsLabels[index]}. {option}</p>
                 </button>
@@ -219,6 +249,20 @@ function AnswerBar() {
 // 左栏
 function LeftBar() {
   const router = useRouter();
+  const {openModal} = useModal();
+  const {number} = router.query;
+  const total = Number(number);
+  const context = useContext(ProblemIndexContext);
+
+  if (!context) {
+    throw new Error("Failed to use problem index.");
+  }
+
+  const {problemIndex} = context;
+
+  const openAlertModal = () => {
+    openModal(AlertModal, {});
+  }
 
   return (
     <div style={{display:"flex", flexDirection:"column", alignItems:"center", width:"220px"}}>
@@ -229,22 +273,19 @@ function LeftBar() {
         <li>
           <Image src="/figures/logo.png" alt="logo.png" width={120} height={130} style={{marginLeft:"20px"}} />
         </li>
-        <li>
-          <p style={{textAlign:"center"}}>还需学习</p>
-        </li>
-        <li>
-          <h1 style={{textAlign:"center"}}>10</h1>
-        </li>
-        <li>
-          <div style={{height:"60px"}}>
+        <li style={{}}>
+          <div style={{height:"1px", backgroundColor:"black", marginBottom:"-10px"}}></div>
+          <p style={{textAlign:"center", fontSize:"20px", marginBottom:"-20px"}}>还需学习</p>
+          <p style={{textAlign:"center", fontSize:"60px"}}>{total - problemIndex}</p>
+          <div style={{height:"140px"}}>
 
           </div>
         </li>
         <li onClick={() => {router.push('/')}}>
           <LinkButton imageUrl='figures/icon/history.svg' text="历史记录"  />
         </li>
-        <li onClick={() => {router.push('/')}}>
-          <LinkButton imageUrl='figures/icon/log_out.svg' text="退出"  />
+        <li onClick={openAlertModal}>
+          <LinkButton imageUrl='figures/icon/log_out.svg' text="退出" />
         </li>
       </ul>
     </div>
@@ -256,8 +297,8 @@ function ReportBar({correct, wrong}: ReportProps) {
     return (
       <div className="report_bar">
         <h1 style={{textAlign:"center"}}>学习报告</h1>
-        <h4>你已经掌握了：</h4>
-        <ul className="word_list">
+        <p style={{fontSize:"20px"}}>你已经掌握了：</p>
+        <ul className="words_list">
           {correct.map((correctQuestion) => (
             <li key={correctQuestion.word.word}>
               <p className="word">
@@ -267,8 +308,8 @@ function ReportBar({correct, wrong}: ReportProps) {
           ))}
         </ul>
 
-        <h4>你还没完全掌握：</h4>
-        <div className="word_list">
+        <p style={{fontSize:"20px"}}>你还没完全掌握：</p>
+        <div className="words_list">
           {wrong.map((wrongQuestion) => (
               <p className="word" key={wrongQuestion.word.word}>
                 {wrongQuestion.word.word}
@@ -304,21 +345,23 @@ function HistoryBar() {
 }
   */
 
-// TODO:错题收藏功能
-
 function AnswerPage() {
   return(
-    <div style={{display:"flex", position:"fixed"}}>
-      <LeftBar />
-      <div style={{display:"flex", flexDirection:"column"}}>
-        <div style={{marginTop:"40px"}}>
-          <InformationBar />
+    <ModalProvider>
+      <ProblemIndexContextProvider>
+        <div style={{display:"flex", position:"fixed"}}>
+        <LeftBar />
+          <div style={{display:"flex", flexDirection:"column"}}>
+            <div style={{marginTop:"40px"}}>
+              <InformationBar />
+            </div>
+            <div style={{backgroundColor:"#e1e1e1", padding:"20px", marginTop:"30px", height:"600px"}}>
+              <AnswerBar />
+            </div>
+          </div>
         </div>
-        <div style={{backgroundColor:"#e1e1e1", padding:"20px", marginTop:"30px"}}>
-          <AnswerBar />
-        </div>
-      </div>
-    </div>
+      </ProblemIndexContextProvider>
+    </ModalProvider>
   )
 }
 

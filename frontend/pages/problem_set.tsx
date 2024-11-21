@@ -17,7 +17,7 @@ interface Word {
 function Exercise() {
   const router = useRouter();
   const handleExercise = () => {
-    router.push('/answer?pool=all');
+    router.push('/answer?pool=all&number=5');
   }
 
   return(
@@ -83,7 +83,7 @@ function DailyErrors() {
     <div className="daily_erros">
       <p>{set}</p>
       <div style={{backgroundColor:"#e1e1e1", borderRadius:"20px", padding:"20px"}}>
-        <ul style={{display:"flex", flexWrap:"wrap", justifyContent:"space-between", listStyleType:"none"}}>
+        <ul style={{display:"flex", flexWrap:"wrap", justifyContent:"space-between", listStyleType:"none", height:"360px", overflowY:"auto"}}>
           { wordList ? (
             wordList.map((item) => (
               <li key={item.word} className="word" onContextMenu={(event) => handleContextMenu(event, item.id)}>

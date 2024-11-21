@@ -49,10 +49,13 @@
 .search_bar {
   display: flex;
   color:white;
+  border: 2px solid black;
   border-radius: 20px;
   height: 30px;
   width: 300px;
   padding-left: 10px;
+  align-items: center;
+  background-color: white;
 }
 
 .problem_set {
@@ -61,13 +64,15 @@
   flex: 1 1 calc(25%-20px);
   color:white;
   margin: 20px;
-  border: 2px solid black ;
+  border: 0px;
   border-radius: 10%;
   box-sizing: border-box;
   text-align: center;
   width: 160px;
   height: 120px;
   gap: 5px;
+  background-color: #eeeeee;
+  box-shadow: 4px 4px 10px rgb(0,0,0,0.4);
 }
 
 .problem_set_bar {
