@@ -2,7 +2,7 @@
 import {useModal} from "./ModalContext";
 import {useState} from "react";
 import {useRouter} from "next/router";
-
+import config from "../config"
 
 interface AnswerModalProps {
   pool: string
@@ -10,6 +10,16 @@ interface AnswerModalProps {
 
 
 function AnswerModal (props: AnswerModalProps) {
+  let pool: string = props.pool;
+  switch (props.pool) {
+    case "words_college3":
+      pool = "college3";
+      break;
+    case "words_college4":
+      pool = "college4";
+      break;
+  }
+
   const {isOpen, closeModal} = useModal(); 
   //const data = useModal().data;
   const router = useRouter();
@@ -19,8 +29,24 @@ function AnswerModal (props: AnswerModalProps) {
     setContent(e.target.value);
   }
 
-  const handleSubmit = () => {
-    router.push(`/answer?pool=${props.pool}&number=${content}`);
+  const handleSubmit = async () => {
+    const wordsResponse =  await fetch(config.apiUrl + `/api/get_${pool}`, {
+        method: "GET",
+        credentials: "include"
+      })
+    const data = await wordsResponse.json();
+    const wordsMax = data.length;
+
+    // 判定输入是否合法
+    const num = Number(content);
+    if (Number.isInteger(num) && (num > 0)) {
+      // 保证要求单词数不大于题库单词数
+      const realNum = (num > wordsMax) ? wordsMax : num;
+      router.push(`/answer?pool=${pool}&number=${String(realNum)}`);
+    }
+    else {
+      alert("请输入一个正整数！"); // baka!
+    }
   }
 
   if (!isOpen ) return null;

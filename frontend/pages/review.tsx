@@ -1,4 +1,5 @@
-// 答题页
+// 复习页
+// 答完一道题即返回原页面
 import Image from 'next/image'
 import "./answer_style.css"
 import InformationBar from "../components/InformationBar"
@@ -8,7 +9,6 @@ import React, {useState, useEffect, useContext, createContext} from "react";
 import { useRouter } from 'next/router';
 import { ModalProvider, useModal } from '@/components/ModalContext';
 import AlertModal from "../components/AlertModal";
-import NavigationBar from '@/components/NavigationBar'
 //import {GetServerSideProps} from "next";
 
 // 记录当前答题进度
@@ -44,23 +44,16 @@ interface Question {
   options: string[];
 }
 
-interface ReportProps {
-  correct: Question[];
-  wrong: Question[];
-}
-
 interface StarButtonProps {
   wordID: number;
   poolName: string;
-  initial: boolean;
 }
 
 // 收藏功能
 function StarButton ( props: StarButtonProps ) {
-  const [isStarred, setIsStarred] = useState(props.initial);
+  const [isStarred, setIsStarred] = useState(false);
 
   const handleStarClick = async () => {
-    setIsStarred(!isStarred);
     try {
       let response;
       if (isStarred) {
@@ -85,6 +78,7 @@ function StarButton ( props: StarButtonProps ) {
 
       const data = response.json();
       console.log(data);
+      setIsStarred(!isStarred);
     } catch (error) {
       console.error("Failed to favorite the word.", error);
     }
@@ -102,8 +96,8 @@ function StarButton ( props: StarButtonProps ) {
 function AnswerBar() {
   const [questions, setQuestions] = useState<Question[]>([]); // 存放本次答题题目
   // const [correctCount, setCorrectCount] = useState(0); // 统计回答正确数量
-  const [correctQuestions, setCorrectQuestions] = useState<Question[]>([]); // 存放回答正确题目
-  const [wrongQuestions, setWrongQuestions] = useState<Question[]>([]); // 存放回答错误题目
+  //const [correctQuestions, setCorrectQuestions] = useState<Question[]>([]); // 存放回答正确题目
+  //const [wrongQuestions, setWrongQuestions] = useState<Question[]>([]); // 存放回答错误题目
   const [showResult, setShowResult] = useState(false); // 控制答案显示状态
   const [selectedOption, setSelectedOption] = useState<string | null>(null); // 记录选择选项
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0); // 记录答题进度
@@ -112,56 +106,48 @@ function AnswerBar() {
   const [starKey, setStarKey] = useState(0); // 记录收藏题目ID
   const context = useContext(ProblemIndexContext); // 记录答题进度
   
-  //const [wordId, setWordId] = useState<number | null>(null);
-  //const [pool, setPool] = useState(null);
-
   if (!context) {
     throw new Error("Failed to use problem index context.")
   }
   const { setProblemIndex} = context;
 
   const router = useRouter();
-  const { pool, number } = router.query;
+  const { problem_set, number, word } = router.query;
 
   const optionsLabels = ["A", "B", "C", "D"];
   const words_total = Number(number); // 每日一练题目数量
+  const wrongWord: WordResponse = JSON.parse(typeof word === "string" ? word : "");
 
   useEffect(() => {
-    if (!pool) return;
+    if (!problem_set) return;
     const fetchQuestion = async () => {
       //const { pull } = context.params;
 
       try {
         // 发送请求
-        const [wordResponse, optionsResponse] = await Promise.all([
-          fetch(config.apiUrl + `/api/get_word?pool=${pool}`, {
-            method: "GET",
-            credentials: "include"
-          })
-          .then((res) => res.json()),
-          fetch(config.apiUrl + '/api/get_options', {
-            method: "GET",
-            credentials: "include"
-          })
-          .then((res) => res.json())
-        ]);
+        const res = await fetch(config.apiUrl + "/api/get_options", {
+          method: "GET",
+          credentials: "include"
+        })
+        const optionsResponse = await res.json();
 
         console.log("Success to fetch word and options.");
 
-        const options = [...optionsResponse, wordResponse.meaning];
+        
+
+        const options = [...optionsResponse, wrongWord.meaning];
         const shuffledOptions = options.sort(() => Math.random() - 0.5); // 选项随机排序
 
         // 构造question
         const newQuestion: Question = {
-          word: wordResponse,
-          correctAnswer: wordResponse.meaning,
+          word: wrongWord,
+          correctAnswer: wrongWord.meaning,
           options: shuffledOptions
         }
 
         setQuestions((prev) => [...prev, newQuestion]);
         setStarKey((prev) => prev + 1);
-        //setWordId(newQuestion.word.id);
-        //setCurrentQuestionIndex(questions.length - 1);
+
       } catch (error) {
         console.log("Failed to fetch question.", error);
       } finally {
@@ -170,11 +156,11 @@ function AnswerBar() {
     }
 
     fetchQuestion();
-  }, [pool, isClick]);
+  }, [problem_set, isClick, wrongWord]);
 
   if (loading) {
     return (
-      <p>少女祈祷中</p>
+      <p style={{top:"50%", left:"50%"}}>少女祈祷中</p>
     )
   }
 
@@ -185,20 +171,6 @@ function AnswerBar() {
     setIsClick(!isClick);
     console.log("show result");
 
-    if (option === questions[currentQuestionIndex].correctAnswer) {
-      // setCorrectCount((prev) => prev + 1);
-      setCorrectQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
-      console.log("Your answer is true");
-    }
-
-    else {
-      setWrongQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
-      console.log("Your answer is wrong.");
-    }
-
-    console.log(currentQuestionIndex);
-    console.log("next question");
-
     setTimeout(() => {
       setSelectedOption(null);
       setShowResult(false);
@@ -207,9 +179,9 @@ function AnswerBar() {
     }, 2000);
   }
 
-    // 完成所有题目后显示答案报告
+    // 答完题后返回原页面
     if (currentQuestionIndex >= words_total) {
-      return <ReportBar correct={correctQuestions} wrong={wrongQuestions}/>
+      router.back();
     }
 
     const currentQuestion: Question = questions[currentQuestionIndex!];
@@ -217,7 +189,7 @@ function AnswerBar() {
     return (
       <div className="answer_bar">
         <div style={{display:"flex", justifyContent:"flex-end", width:"700px", marginBottom:"-40px"}}>
-          <StarButton wordID={questions[currentQuestionIndex].word.id} poolName={typeof pool === "string" ? pool : "all"} initial={pool === "favorites"} key={starKey}/>
+          <StarButton wordID={wrongWord.id} poolName={typeof problem_set === "string" ? problem_set : "all"} key={starKey}/>
         </div>
         <>
           <p style={{fontSize:"30px", fontWeight:"bold"}}>{currentQuestion.word.word}</p>
@@ -287,58 +259,15 @@ function LeftBar() {
 
           </div>
         </li>
-        <li onClick={openAlertModal}>
+        <li onClick={() => {router.push('/')}}>
           <LinkButton imageUrl='figures/icon/history.svg' text="历史记录"  />
         </li>
-        <li onClick={() => {
-          if (total - problemIndex <= 0) {
-            router.push("/");
-          }
-          else {
-            openAlertModal();
-          }
-        }}>
+        <li onClick={openAlertModal}>
           <LinkButton imageUrl='figures/icon/log_out.svg' text="退出" />
         </li>
       </ul>
     </div>
   )
-}
-
-// 报告栏
-function ReportBar({correct, wrong}: ReportProps) {
-    return (
-      <div className="report_bar">
-        <h1 style={{textAlign:"center"}}>学习报告</h1>
-        <p style={{fontSize:"20px"}}>你已经掌握了：</p>
-        <ul className="words_list">
-          {correct.map((correctQuestion) => (
-            <li key={correctQuestion.word.word}>
-              <p className="word">
-                {correctQuestion.word.word}  
-              </p> 
-            </li>
-          ))}
-        </ul>
-
-        <p style={{fontSize:"20px"}}>你还没完全掌握：</p>
-        <div className="words_list">
-          {wrong.map((wrongQuestion) => (
-              <p className="word" key={wrongQuestion.word.word}>
-                {wrongQuestion.word.word}
-              </p>
-          ))}
-        </div>
-
-        {!wrong.length ? (
-          <p>你都掌握了！Good！</p>) : (
-            <p>下次再努力吧！</p>
-          )
-        }
-        <h3>记得多多复习，将知识掌握扎实！</h3>
-
-      </div>
-    )
 }
 
 /*
@@ -358,32 +287,12 @@ function HistoryBar() {
 }
   */
 
-function AnswerInnerPage() {
-  const router = useRouter();
-  const {number} = router.query;
-  const num = Number(number);
-  const context = useContext(ProblemIndexContext);
-
-  if (!context) {
-    throw new Error("Failed to use problem index context.");
-  }
-  const {problemIndex} = context;
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    console.log("Problem index changed.");
-    setCurrentIndex(problemIndex);
-  }, [currentIndex, problemIndex])
-  
+function ReviewPage() {
   return(
     <ModalProvider>
       <ProblemIndexContextProvider>
-        <div style={{display:"flex", position:"fixed"}} >
-          <div >
-          {
-            (currentIndex >= (num - 2)) ? <NavigationBar /> : <LeftBar />
-          }
-          </div>
+        <div style={{display:"flex", position:"fixed"}}>
+        <LeftBar />
           <div style={{display:"flex", flexDirection:"column"}}>
             <div style={{marginTop:"40px"}}>
               <InformationBar />
@@ -398,12 +307,4 @@ function AnswerInnerPage() {
   )
 }
 
-function AnswerPage() {
-  return (
-    <ProblemIndexContextProvider>
-      <AnswerInnerPage />
-    </ProblemIndexContextProvider>
-  )
-}
-
-export default  AnswerPage;
+export default  ReviewPage;

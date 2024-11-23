@@ -1,4 +1,4 @@
-// 错题集
+// 词汇集
 import InformationBar from "../components/InformationBar";
 import NavigationBar from "../components/NavigationBar";
 import "./errors_style.css"
@@ -17,7 +17,7 @@ interface Word {
 function Exercise() {
   const router = useRouter();
   const handleExercise = () => {
-    router.push('/answer?pool=all&number=5');
+    router.push('/problem_set?pool=misses&number=5');
   }
 
   return(
@@ -79,6 +79,11 @@ function DailyErrors() {
     handleDelete(id);
   }
 
+  const handleReview = (word: Word) => {
+    sessionStorage.setItem("wrongWord", JSON.stringify(word));
+    router.push(`/review?problem_set=${set}&number=1&word=${JSON.stringify(word)}`);
+  }
+
   return(
     <div className="daily_erros">
       <p>{set}</p>
@@ -86,7 +91,8 @@ function DailyErrors() {
         <ul style={{display:"flex", flexWrap:"wrap", justifyContent:"space-between", listStyleType:"none", height:"360px", overflowY:"auto"}}>
           { wordList ? (
             wordList.map((item) => (
-              <li key={item.word} className="word" onContextMenu={(event) => handleContextMenu(event, item.id)}>
+              <li key={item.word} className="word" onClick={() => handleReview(item)}
+              onContextMenu={(event) => handleContextMenu(event, item.id)}>
                 {item.word}
               </li>
             ))

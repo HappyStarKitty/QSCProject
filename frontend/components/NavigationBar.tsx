@@ -19,6 +19,7 @@ function NavigationBar() {
     } catch (error) {
       console.error("Failed to log out.", error);
     };
+    router.push("/login");
     
   }
 
