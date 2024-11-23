@@ -188,6 +188,17 @@ function AnswerBar() {
     setIsClick(!isClick);
     console.log("show result");
 
+    const judgeResponse = fetch(config.apiUrl + "/api/check_answer", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({word_id: questions[currentQuestionIndex].word.id, user_answer: option,correct_answer: questions[currentQuestionIndex].word.meaning})
+    });
+
+    console.log(judgeResponse);
+
     if (option === questions[currentQuestionIndex].correctAnswer) {
       // setCorrectCount((prev) => prev + 1);
       setCorrectQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
@@ -196,7 +207,18 @@ function AnswerBar() {
 
     else {
       setWrongQuestions((prev) => [...prev, questions[currentQuestionIndex]]);
+      const res = fetch(config.apiUrl + "/api/miss", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({word_id: questions[currentQuestionIndex].word.id})
+      })
+      .then((res) => res.json());
+      console.log(res);
       console.log("Your answer is wrong.");
+
     }
 
     console.log(currentQuestionIndex);
@@ -212,6 +234,11 @@ function AnswerBar() {
 
     // 完成所有题目后显示答案报告
     if (currentQuestionIndex >= words_total) {
+      /*
+      const reportResponse = fetch(config.apiUrl + "/api/save_report", {
+        method  
+      })
+       */
       return <ReportBar correct={correctQuestions} wrong={wrongQuestions}/>
     }
 
@@ -384,7 +411,7 @@ function AnswerInnerPage() {
         <div style={{display:"flex", position:"fixed"}} >
           <div >
           {
-            (currentIndex >= (num - 2)) ? <NavigationBar /> : <LeftBar />
+            (currentIndex >= (num - 1)) ? <NavigationBar /> : <LeftBar />
           }
           </div>
           <div style={{display:"flex", flexDirection:"column"}}>
