@@ -58,12 +58,15 @@ interface StarButtonProps {
 // 收藏功能
 function StarButton ( props: StarButtonProps ) {
   const [isStarred, setIsStarred] = useState(props.initial);
+  //console.log(isStarred);
 
   const handleStarClick = async () => {
+    const newIsStarred = !isStarred;
     setIsStarred(!isStarred);
+    console.log(isStarred);
     try {
       let response;
-      if (isStarred) {
+      if (newIsStarred) {
         response = await fetch(config.apiUrl + `/api/favorite`, {
           method: "POST",
           credentials: "include",
@@ -91,9 +94,9 @@ function StarButton ( props: StarButtonProps ) {
   }
 
   return (
-    <div style={{display:"flex", flexDirection:"row-reverse", alignItems:"flex-end"}}>
+    <div style={{display:"flex", flexDirection:"row-reverse", alignItems:"flex-end"}} onClick={handleStarClick}>
       <Image src={isStarred ? '/figures/icon/star_light.svg' : '/figures/icon/star_dark.svg'}
-        alt="star.svg" width={40} height={40} style={{float:"right"}} onClick={handleStarClick}/>
+        alt="star.svg" width={40} height={40} style={{float:"right"}} />
     </div>
   )
 }
@@ -241,7 +244,7 @@ function AnswerBar() {
                       : showResult && option === selectedOption
                       ? '#F97070'
                       : 'white' 
-                }}>
+                }} disabled={selectedOption !==null && selectedOption !== option}>
                   <p>{optionsLabels[index]}. {option}</p>
                 </button>
               </li>
