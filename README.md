@@ -1,4 +1,3 @@
-# QSCProject
 
 ## 部署方式
 
